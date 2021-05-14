@@ -33,22 +33,6 @@ public class Multithreading {
         
     }
     
-    
-    //método criado para mandar requsições de volta ao servidor cliente
-//    public static void mandarRequisicao(String mensagem) throws IOException{
-//        
-//        Socket usuario = new Socket("localhost",5566);
-//        BufferedReader entrada = new BufferedReader(new InputStreamReader(usuario.getInputStream()));
-//        PrintWriter saida = new PrintWriter(usuario.getOutputStream(),true);
-//        
-//        Socket usuariodois = new Socket("localhost",5577);
-//        BufferedReader entradadois = new BufferedReader(new InputStreamReader(usuariodois.getInputStream()));
-//        PrintWriter saidadois = new PrintWriter(usuariodois.getOutputStream(),true);
-//        
-//        saida.println(mensagem);
-//        saidadois.println(mensagem);
-//    
-//    }
         
 }
 
@@ -80,31 +64,20 @@ class ManipuladorDeServidores extends Thread{
             
             while(true){
                 String msg = (String) entrada.readLine();
-                if(msg==null){
+                if(msg!= null){                    
+
+                    System.out.println("isso é apenas para testar como a mensagem chega até multithreading " +msg);
+
+                    localizacaoCompartilhada.set(msg);
+
                     String resposta = localizacaoCompartilhada.get();
-                    return;
+
+                    for(PrintWriter writer: Multithreading.printWriters){
+                        System.out.println("esta é a mensagem de retorno dentro do for "+resposta);
+                        writer.println(resposta);                       
+                    }                  
                 }
-                
-                System.out.println("isso é apenas para testar como a mensagem chega até multithreading" +msg);
-                
-                localizacaoCompartilhada.set(msg);
-                
-                String resposta = localizacaoCompartilhada.get();
-
-                
-                //repassei dessa mesma maneira a mensagem do servidor para o cliente, mas não está enviando
-                // aqui da Raiz para o servidoCliente
-
-                //Aqui eu tinha comentado para passar os dados via requisição também
-                
-                for(PrintWriter writer: Multithreading.printWriters){
-                    System.out.println("esta é a mensagem de retorno dentro do for "
-                        +resposta);
-                    writer.println(resposta);
-                }   
-                  //Multithreading.mandarRequisicao(resposta);
-                
-                                              
+                System.out.println("Número de usuários conectados "+Multithreading.printWriters.size());  
             }
             
         }catch(Exception e){

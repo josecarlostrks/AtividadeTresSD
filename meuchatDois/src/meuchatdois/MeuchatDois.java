@@ -75,11 +75,8 @@ public class MeuchatDois {
    
     }
     
-    static boolean escrevendoNoEspacoCompartilhado(String n) throws IOException{
-                
-            String msg = n;
-            saidaServidor.println(msg);           
-            return true;
+    static void escrevendoNoEspacoCompartilhado(String n) throws IOException{
+            saidaServidor.println(n);           
     }
     
     public static boolean validarEmail(String email){
@@ -124,75 +121,49 @@ class ManipuladorConversa extends Thread{
                     saida.println("EMAIL_REQUERIDO");
                 }
                 String email = (String) entrada.readLine();
+
+                if(email==null){
+                    return;                                     
+                } 
+
                 if(MeuchatDois.validarEmail(email)){
                     MeuchatDois.emailUsuario=email;
-                    mail++;
                      break;  
-                }else{
-                    saida.println("EMAIL_INVÁLIDO");
                 }
-                if(nomeUsuario==null){
-                    return;                                     
-                }                    
+                mail++;
+                   
             }             
             
-                while(true){
-                    if(contador > 0){
-                        saida.println("NOME_EXISTENTE");
-                    }else{
-                        saida.println("NOME_REQUERIDO");
-                        System.out.println("ainda não digitou o nome");
-                    }
-                    nomeUsuario = (String) entrada.readLine();
-                    System.out.println(nomeUsuario);
-                    if(nomeUsuario==null){
-                        return;
-                    }
-                    if(!MeuchatDois.nomesUsuarios.contains(nomeUsuario)){
-                        MeuchatDois.nomesUsuarios.add(nomeUsuario);
-                        contador++;                        
-                        break;                         
-                    }                
-                }
-                saida.println("NOME_ACEITO");
-
+            saida.println("EMAIL_ACEITO");
 
 
                 //adicionando o novo usuário a lista de usuários conectados ao servidor
                 //todos da lista recebem as mensagens enviadas ao chat.
-                //MeuchatDois.printWriters.add(saida);
+             MeuchatDois.printWriters.add(saida);
 
-
-                //laço que recebe e trata cada mensagem enviada.
-                //se a mensagem é válida ela é enviada para o servidor Raiz
-    
-                
-                while(true){
-                    String msg = (String) entrada.readLine();
-                    //String resposta = MeuChat.escrevendoNoEspacoCompartilhado(msg);
-                    
-                    //LEIA AQUI PARA RECOMEÇAR É PRECISO FICAR ENVIANDO REQUISIÇÕES NULAS DO CLIENTE.
-                    if(msg==""){
-                        MeuchatDois.lendoDoEspacoCompartilhado();
-
-                        
-            for(PrintWriter writer: MeuchatDois.printWriters){
-                writer.println("raiz" +": " 
-                   +MeuchatDois.mensagensDoServidor.get(MeuchatDois.mensagensParaClientes)+"                     "
-                +LocalDate.now().toString());
-                MeuchatDois.mensagensParaClientes++;
-
-            }                        
-
-                         return;
-       
-                    }else{
-                        MeuchatDois.escrevendoNoEspacoCompartilhado(msg);
-                        MeuchatDois.lendoDoEspacoCompartilhado();
-                    }               
-
-                }
-             
+             while(true){
+                 
+                 String msg = (String) entrada.readLine();
+                 String vazia ="";
+                 if(msg==null){
+                     System.out.println("mensagem nula por isso volta");
+                     continue;
+                 }
+                 
+                 System.out.println("mensagem do cliente "+msg);
+                 if(msg.equals(vazia)){
+                     System.out.println("pressionou enter");
+                 }else{
+                     MeuchatDois.escrevendoNoEspacoCompartilhado(msg);
+                 }
+                 
+                 if(MeuchatDois.entradaServidor.readLine()!=null){
+                     for(PrintWriter writer: MeuchatDois.printWriters){
+                         writer.println((String)MeuchatDois.entradaServidor.readLine());
+                     }                 
+                 }
+             }
+                 
             
         }catch(Exception e){
             System.out.println("Erro no Servidor "+ e.getMessage());

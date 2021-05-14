@@ -104,7 +104,7 @@ class ManipuladorConversa extends Thread{
             this.entrada = new BufferedReader(new InputStreamReader(usuarioConversa.getInputStream()));
             this.saida = new PrintWriter(usuarioConversa.getOutputStream(), true);
             
-            int contador = 0;
+            
             //laço infinito que trata do nome, o usuário só pode mandar e receber mensagens
             //se digitar um nome válido.
             int mail = 0;
@@ -115,37 +115,22 @@ class ManipuladorConversa extends Thread{
                     saida.println("EMAIL_REQUERIDO");
                 }
                 String email = (String) entrada.readLine();
+
+                if(email==null){
+                    return;                                     
+                }                   
+                
                 if(MeuChat.validarEmail(email)){
                     MeuChat.emailUsuario=email;
-                    mail++;
+                    
                      break;  
-                }else{
-                    saida.println("EMAIL_INVÁLIDO");
                 }
-                if(nomeUsuario==null){
-                    return;                                     
-                }                    
-            }              
+                mail++;
+                 
+            } 
+            saida.println("EMAIL_ACEITO");
+            
 
-                while(true){
-                    if(contador > 0){
-                        saida.println("NOME_EXISTENTE");
-                    }else{
-                        saida.println("NOME_REQUERIDO");
-                        System.out.println("ainda não digitou o nome");
-                    }
-                    nomeUsuario = (String) entrada.readLine();
-                    System.out.println(nomeUsuario);
-                    if(nomeUsuario==null){
-                        return;
-                    }
-                    if(!MeuChat.nomesUsuarios.contains(nomeUsuario)){
-                        MeuChat.nomesUsuarios.add(nomeUsuario);
-                        break;
-                    }
-                    contador++;
-                }
-                saida.println("NOME_ACEITO");
 
 
 
@@ -156,31 +141,29 @@ class ManipuladorConversa extends Thread{
 
                 //laço que recebe e trata cada mensagem enviada.
                 //se a mensagem é válida ela é enviada para o servidor Raiz
-                while(true){
-                    String msg = (String) entrada.readLine();
-                    //String resposta = MeuChat.escrevendoNoEspacoCompartilhado(msg);
-                    
-                    //LEIA AQUI PARA RECOMEÇAR É PRECISO FICAR ENVIANDO REQUISIÇÕES NULAS DO CLIENTE.
-                    if(msg==""){
-                        MeuChat.lendoDoEspacoCompartilhado();
+            while(true){
+                
+                String msg = (String) entrada.readLine();
+                String vazia ="";
 
-                        
-            for(PrintWriter writer: MeuChat.printWriters){
-                writer.println("raiz" +": " 
-                   +MeuChat.mensagensDoServidor.get(MeuChat.mensagensParaClientes)+"                     "
-                +LocalDate.now().toString());
-                MeuChat.mensagensParaClientes++;
-
-            }                        
-
-                         return;
-       
-                    }else{
-                        MeuChat.escrevendoNoEspacoCompartilhado(msg);
-                        MeuChat.lendoDoEspacoCompartilhado();
-                    }               
-
-                }
+                 
+                 if(msg==null){
+                     System.out.println("nula");
+                     continue;
+                 }
+                 
+                 System.out.println("mensagem do cliente "+msg);
+                 if(msg.equals(vazia)){
+                     System.out.println("pressionou enter");
+                 }else{
+                     MeuChat.escrevendoNoEspacoCompartilhado(msg);
+                 }
+                 
+                 if(MeuChat.entradaServidor.readLine()!=null){
+                     for(PrintWriter writer: MeuChat.printWriters){
+                         writer.println((String)MeuChat.entradaServidor.readLine());
+                     }                  
+             }
             
             
         }catch(Exception e){
